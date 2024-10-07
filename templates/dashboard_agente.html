@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Agente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            background-color: #343a40;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            display: block;
+            text-align: center;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #007bff;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #343a40;
+        }
+
+        .perfil-usuario {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .foto-perfil {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .turnos-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .turno-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .turno-card:hover {
+            background-color: #f0f8ff;
+        }
+
+        .turno-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .turno-info p {
+            margin: 0;
+            color: #343a40;
+            font-size: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de navegación lateral -->
+    <nav class="sidebar">
+        <ul>
+            <li><a href="{{ url_for('dashboard_agente') }}" class="active"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="{{ url_for('historial_agente') }}"><i class="fas fa-history"></i> Historial</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="perfil-usuario">
+            <img src="{{ url_for('uploaded_file', filename=usuario.foto_perfil) }}" alt="Foto de Perfil"
+                class="foto-perfil">
+            <p>{{ usuario.nombre }}</p>
+        </div>
+
+        <h1>Turnos de Hoy</h1>
+
+        <!-- Turnos del agente -->
+        <div class="turnos-container">
+            {% if turnos_hoy %}
+            {% for turno in turnos_hoy %}
+            <div class="turno-card">
+                <div class="turno-info">
+                    <p><strong>Fecha:</strong> {{ turno.fecha }}</p>
+                    <p><strong>Entrada:</strong> {{ turno.hora_entrada or 'No registrada' }}</p>
+                    <p><strong>Salida:</strong> {{ turno.hora_salida or 'No registrada' }}</p>
+                    <p><strong>Desayuno:</strong> {{ turno.hora_desayuno or 'No registrado' }}</p>
+                    <p><strong>Almuerzo:</strong> {{ turno.hora_almuerzo or 'No registrado' }}</p>
+                    <p><strong>Estado:</strong> {{ turno.estado }}</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" data-url="{{ url_for('marcar_entrada', turno_id=turno.id) }}">Entrada</button>
+                    <button class="btn" data-url="{{ url_for('marcar_salida', turno_id=turno.id) }}">Salida</button>
+                    <button class="btn" data-url="{{ url_for('marcar_desayuno', turno_id=turno.id) }}">Desayuno</button>
+                    <button class="btn" data-url="{{ url_for('marcar_almuerzo', turno_id=turno.id) }}">Almuerzo</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No tienes turnos asignados para hoy.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+
+    <!-- Script para marcar acciones -->
+    <script>
+        function marcarAccion(url) {
+            fetch(url, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();  // Recargar la página para actualizar los datos
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Asignar eventos a los botones usando los datos 'data-url'
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                if (url) {
+                    marcarAccion(url);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

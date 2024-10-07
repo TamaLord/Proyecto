@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Dashboard Agente</title>
+</head>
+
+<body class="dashboard-agente">
+    <!-- Barra de navegación lateral -->
+    <nav class="sidebar">
+        <ul>
+            <li><a href="{{ url_for('dashboard_agente') }}" class="active"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="{{ url_for('historial_agente') }}"><i class="fas fa-history"></i> Historial</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Perfil del usuario -->
+    <div class="perfil-modo-oscuro">
+        <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+        </label>
+
+        <div class="perfil-usuario">
+            <img src="{{ url_for('uploaded_file', filename=usuario.foto_perfil) }}" alt="Foto de Perfil"
+                class="foto-perfil">
+            <p>{{ usuario.nombre }}</p>
+            <div class="dropdown-content">
+                <a href="{{ url_for('editar_perfil') }}">Editar Perfil</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Bienvenido, {{ usuario.nombre }}</h1>
+
+        <!-- Botones para marcar turnos -->
+        <div class="botones-turno">
+            <form action="{{ url_for('marcar_entrada') }}" method="POST">
+                <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Marcar Entrada</button>
+            </form>
+
+            <form action="{{ url_for('marcar_salida') }}" method="POST">
+                <button type="submit" class="btn"><i class="fas fa-sign-out-alt"></i> Marcar Salida</button>
+            </form>
+
+            <form action="{{ url_for('marcar_desayuno') }}" method="POST">
+                <button type="submit" class="btn"><i class="fas fa-coffee"></i> Marcar Desayuno</button>
+            </form>
+
+            <form action="{{ url_for('marcar_almuerzo') }}" method="POST">
+                <button type="submit" class="btn"><i class="fas fa-utensils"></i> Marcar Almuerzo</button>
+            </form>
+        </div>
+
+        <!-- Historial de actividades del día -->
+        <div class="historial">
+            <h2>Registro del día</h2>
+            {% if registro_turno %}
+            <ul>
+                <li>Entrada: {{ registro_turno.hora_entrada or 'No registrada' }}</li>
+                <li>Salida: {{ registro_turno.hora_salida or 'No registrada' }}</li>
+                <li>Desayuno: {{ registro_turno.hora_desayuno or 'No registrado' }}</li>
+                <li>Almuerzo: {{ registro_turno.hora_almuerzo or 'No registrado' }}</li>
+            </ul>
+            {% else %}
+            <p>No hay registro de turnos para hoy.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+
+    <!-- Script para el modo oscuro -->
+    <script>
+        // Mostrar/ocultar el menú desplegable al hacer clic en la imagen de perfil
+        document.querySelector('.foto-perfil').addEventListener('click', function () {
+            const dropdown = document.querySelector('.dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Modo oscuro
+        const toggleSwitch = document.getElementById('toggle-dark-mode');
+        toggleSwitch.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>

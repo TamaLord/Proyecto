@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Call Center Management{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <!-- Barra de navegación común -->
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dashboard_admin') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('gestion_usuarios') }}">Gestionar Usuarios</a></li>
+            <li><a href="{{ url_for('cargar_excel') }}">Cargar Excel</a></li>
+            <li><a href="{{ url_for('asignar_turno') }}">Asignar Turnos</a></li>
+            <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido específico de cada página -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Pie de página común -->
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+</body>
+
+</html>

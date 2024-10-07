@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="notificaciones">
+    <nav class="sidebar">
+        <ul>
+            <li><a href="{{ url_for('dashboard_agente') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('notificaciones') }}" class="active">Notificaciones</a></li>
+            <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <h1>Notificaciones</h1>
+        <ul>
+            {% for notificacion in notificaciones %}
+            <li>{{ notificacion.mensaje }}</li>
+            {% else %}
+            <li>No tienes notificaciones pendientes.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+</body>
+
+</html>

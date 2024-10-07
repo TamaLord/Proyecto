@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Asignar Turnos</title>
+</head>
+
+<body class="dashboard-admin">
+    <!-- Barra de navegación lateral -->
+    <nav class="sidebar">
+        <ul>
+            <li><a href="{{ url_for('dashboard_admin') }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('gestion_usuarios') }}"><i class="fas fa-users"></i> Gestionar Usuarios</a></li>
+            <li><a href="{{ url_for('crear_usuario') }}"><i class="fas fa-user-plus"></i> Crear Usuario</a></li>
+            <li><a href="{{ url_for('cargar_excel') }}"><i class="fas fa-file-excel"></i> Cargar Excel</a></li>
+            <li><a href="{{ url_for('asignar_turno') }}" class="active"><i class="fas fa-calendar-alt"></i> Asignar
+                    Turnos</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Perfil del usuario y botón de modo oscuro -->
+    <div class="perfil-modo-oscuro">
+        <!-- Botón para cambiar el tema (toggle switch) -->
+        <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+        </label>
+
+        <!-- Perfil del usuario -->
+        <div class="perfil-usuario">
+            <img src="{{ url_for('uploaded_file', filename=usuario.foto_perfil) }}" alt="Foto de Perfil"
+                class="foto-perfil" id="foto-perfil">
+            <p>{{ usuario.nombre }}</p>
+            <div class="dropdown-content" id="dropdown-content">
+                <a href="{{ url_for('editar_perfil') }}">Editar Perfil</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Asignar Turno</h1>
+
+        <form action="{{ url_for('asignar_turno') }}" method="POST" class="form-asignar-turno">
+            <div class="form-group">
+                <label for="agente_id">Selecciona un agente:</label>
+                <select name="agente_id" id="agente_id" required>
+                    {% for agente in agentes %}
+                    <option value="{{ agente.id }}">{{ agente.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha">Fecha:</label>
+                <input type="date" name="fecha" id="fecha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hora_inicio">Hora de Inicio:</label>
+                <input type="time" name="hora_inicio" id="hora_inicio" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hora_fin">Hora de Fin:</label>
+                <input type="time" name="hora_fin" id="hora_fin" required>
+            </div>
+
+            <button type="submit" class="btn-asignar-turno"><i class="fas fa-calendar-plus"></i> Asignar Turno</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+
+    <!-- Script para el modo oscuro -->
+    <script>
+        // Mostrar/ocultar el menú desplegable al hacer clic en la imagen de perfil
+        document.getElementById('foto-perfil').addEventListener('click', function () {
+            const dropdown = document.getElementById('dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Modo oscuro
+        const toggleSwitch = document.getElementById('toggle-dark-mode');
+        toggleSwitch.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>

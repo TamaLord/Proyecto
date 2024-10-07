@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js desde CDN -->
+</head>
+
+<body class="dashboard-admin">
+    <!-- Barra de navegación lateral -->
+    <nav class="sidebar">
+        <ul>
+            <li><a href="{{ url_for('dashboard_admin') }}" class="active"><i class="fas fa-chart-line"></i>
+                    Dashboard</a></li>
+            <li><a href="{{ url_for('gestion_usuarios') }}"><i class="fas fa-users"></i> Gestionar Usuarios</a></li>
+            <li><a href="{{ url_for('crear_usuario') }}"><i class="fas fa-user-plus"></i> Crear Usuario</a></li>
+            <li><a href="{{ url_for('cargar_excel') }}"><i class="fas fa-file-excel"></i> Cargar Excel</a></li>
+            <li><a href="{{ url_for('asignar_turno') }}"><i class="fas fa-calendar-alt"></i> Asignar Turnos</a></li>
+            <li><a href="{{ url_for('exportar_productividad') }}"><i class="fas fa-file-download"></i> Exportar
+                    Productividad</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sección de perfil y modo oscuro -->
+    <div class="perfil-modo-oscuro">
+        <!-- Botón para cambiar el tema (toggle switch) -->
+        <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+        </label>
+
+        <!-- Perfil del usuario -->
+        <div class="perfil-usuario">
+            <img src="{{ url_for('static', filename='uploads/' ~ usuario.foto_perfil) }}" alt="Foto de Perfil"
+                class="foto-perfil" id="foto-perfil">
+            <p>{{ usuario.nombre }}</p>
+            <div class="dropdown-content" id="dropdown-content">
+                <a href="{{ url_for('editar_perfil') }}">Editar Perfil</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal del dashboard -->
+    <div class="main-content dashboard-admin">
+        <h1>Bienvenido al Dashboard del Administrador</h1>
+
+        <!-- Sección de estadísticas -->
+        <div class="stats-container">
+            <div class="stat-box">
+                <h3><i class="fas fa-user-check"></i> Usuarios Activos</h3>
+                <p>{{ usuarios_activos }}</p>
+            </div>
+            <div class="stat-box">
+                <h3><i class="fas fa-calendar-check"></i> Turnos Asignados Hoy</h3>
+                <p>{{ turnos_totales }}</p>
+            </div>
+            <div class="stat-box">
+                <h3><i class="fas fa-tasks"></i> Turnos Pendientes</h3>
+                <p>{{ turnos_pendientes }}</p>
+            </div>
+        </div>
+
+        <!-- Productividad de los agentes -->
+        <div class="productividad">
+            <h2>Productividad de los Agentes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Total de Horas Trabajadas</th>
+                        <th>Turnos Completados</th>
+                        <th>Pausas (Desayuno/Almuerzo)</th>
+                        <th>Última Entrada</th>
+                        <th>Última Salida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in productividad %}
+                    <tr>
+                        <td>{{ item.agente }}</td>
+                        <td>{{ item.total_horas | round(0) }}</td>
+                        <td>{{ item.turnos_completados }}</td>
+                        <td>{{ item.pausas }}</td>
+                        <td>{{ item.ultima_entrada or 'N/A' }}</td>
+                        <td>{{ item.ultima_salida or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sección de gráficos -->
+        <div class="charts-container">
+            <div class="chart-box">
+                <h3><i class="fas fa-chart-bar"></i> Turnos por Usuario</h3>
+                <canvas id="turnosChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3><i class="fas fa-chart-line"></i> Turnos por Horas</h3>
+                <canvas id="horasChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Sección de acciones rápidas -->
+        <div class="actions-container">
+            <h2>Acciones Rápidas</h2>
+            <button onclick="location.href='/asignar_turno'"><i class="fas fa-calendar-plus"></i> Asignar Nuevo
+                Turno</button>
+            <button onclick="location.href='/cargar_excel'"><i class="fas fa-file-upload"></i> Cargar Turnos desde
+                Excel</button>
+            <button onclick="location.href='/crear_usuario'"><i class="fas fa-user-cog"></i> Gestionar Usuarios</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Call Center Management</p>
+    </footer>
+
+    <!-- Scripts para Chart.js -->
+    <script>
+        // Datos y configuración para el gráfico de Turnos por Usuario
+        const ctx1 = document.getElementById('turnosChart').getContext('2d');
+        const turnosChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Usuario 1', 'Usuario 2', 'Usuario 3', 'Usuario 4'],
+                datasets: [{
+                    label: 'Turnos Asignados',
+                    data: [12, 19, 3, 5],
+                    backgroundColor: '#FF7043',
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Datos y configuración para el gráfico de Turnos por Horas
+        const ctx2 = document.getElementById('horasChart').getContext('2d');
+        const horasChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['6 AM', '7 AM', '8 AM', '9 AM', '10 AM', '11 AM', '12 PM'],
+                datasets: [{
+                    label: 'Turnos por Hora',
+                    data: [2, 3, 5, 7, 6, 4, 8],
+                    borderColor: '#FFA726',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Mostrar/ocultar el menú desplegable al hacer clic en la imagen de perfil
+        document.getElementById('foto-perfil').addEventListener('click', function () {
+            const dropdown = document.getElementById('dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Cerrar el menú desplegable si se hace clic fuera de él
+        window.onclick = function (event) {
+            if (!event.target.matches('.foto-perfil')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        // Modo oscuro
+        const toggleSwitch = document.getElementById('toggle-dark-mode');
+        toggleSwitch.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>

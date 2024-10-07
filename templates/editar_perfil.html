@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Editar Perfil</title>
+</head>
+
+<body class="perfil-page">
+    <!-- Contenedor principal -->
+    <div class="perfil-container">
+        <div class="perfil-header">
+            <h1>Editar Perfil</h1>
+        </div>
+
+        <!-- Contenedor de edición de perfil -->
+        <div class="perfil-content">
+            <div class="perfil-sidebar">
+                <div class="foto-container">
+                    <!-- Verifica si el usuario tiene una foto de perfil, sino muestra una imagen predeterminada -->
+                    <img src="{{ url_for('uploaded_file', filename=usuario.foto_perfil) if usuario.foto_perfil else url_for('static', filename='default_profile.png') }}"
+                        alt="Foto de Perfil" class="foto-perfil">
+                    <p>{{ usuario.nombre }}</p>
+                </div>
+                <form action="{{ url_for('editar_perfil') }}" method="POST" enctype="multipart/form-data">
+                    <label class="btn-subir-foto" for="foto_perfil">
+                        <i class="fas fa-camera"></i> Cambiar Foto
+                    </label>
+                    <input type="file" name="foto_perfil" id="foto_perfil" style="display: none;">
+            </div>
+
+            <div class="perfil-formulario">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo:</label>
+                    <input type="text" name="nombre" value="{{ usuario.nombre }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico:</label>
+                    <input type="email" name="correo" value="{{ usuario.correo_electronico }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Nueva Contraseña:</label>
+                    <input type="password" name="password" placeholder="Deja en blanco para no cambiarla">
+                </div>
+
+                <button type="submit" class="btn-guardar"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+            </form>
+
+            <!-- Botón para volver al dashboard -->
+            <div class="volver-dashboard">
+                <a href="{{ url_for('dashboard_admin' if usuario.rol == 'admin' else 'dashboard_agente') }}"
+                    class="btn-volver">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
